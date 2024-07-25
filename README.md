@@ -40,7 +40,7 @@ Please cite the following manuscript for using DNAm models built and association
 The codes in the `/ana_Res` folder were used to generate figures in the manuscript.  
 
 ## Supporting files
-`support_MWAS.R` and `support.R` are the supporting functions to run the pipeline.  
+`support_MWAS.R`, `BLISSAssociation_Support.R` and `support.R` are the supporting functions to run the pipeline.  
 ## References
 1. Min, J. L., Hemani, G., Hannon, E., Dekkers, K. F., Castillo-Fernandez, J., Luijk, R., ... & Visscher, P. M. (2021). Genomic and phenotypic insights from an atlas of genetic effects on DNA methylation. Nature genetics, 53(9), 1311-1321.
 2. Xue, H., Shen, X., & Pan, W. (2023). Causal inference in transcriptome-wide association studies with invalid instruments and GWAS summary data. Journal of the American Statistical Association, 118(543), 1525-1537.

@@ -1,11 +1,29 @@
 # Multi-ancestry-monocytes-methylome-study
 ## Introduction
-Elucidating the genetic architecture of DNA methylation (DNAm) is crucial for decoding the etiology of complex diseases. However, current epigenomic studies often suffer from incomplete coverage of methylation sites and the use of tissues containing heterogeneous cell populations. To address these challenges, we present a comprehensive human methylome atlas based on deep whole-genome bisulfite sequencing (WGBS) and whole-genome sequencing (WGS) of purified monocytes from 298 European Americans (EA) and 160 African Americans (AA) in the Louisiana Osteoporosis Study. Our atlas enables the analysis of over 25 million DNAm sites. We identified 1,383,250 and 1,721,167 methylation quantitative trait loci (meQTLs) in cis-regions for EA and AA populations, respectively, with 880,108 sites shared between ancestries. While cis-meQTLs exhibited population-specific patterns, primarily due to differences in minor allele frequencies, shared cis-meQTLs showed high concordance across ancestries. Notably, cis-heritability estimates revealed significantly higher mean values in the AA population (0.09) compared to the EA population (0.04). Furthermore, we developed population-specific DNAm imputation models using Elastic Net, enabling methylome-wide association studies (MWAS) for 1,976,046 and 2,657,581 methylation sites in EA and AA, respectively. The performance of our MWAS models was validated through a systematic multi-ancestry analysis of 41 complex traits from the Million Veteran Program. Our findings bridge the gap between genomics and the monocyte methylome, uncovering novel methylation-phenotype associations and their transferability across diverse ancestries. The identified meQTLs, MWAS models, and data resources are freely available at www.gcbhub.org.  
+This is a comprehensive multi-ancestry methylome-wide association study (MWAS) conducted on purified monocytes from European American (EA) and African American (AA) populations.
+Key Features:  
+•	Whole-genome bisulfite sequencing (WGBS) data from 298 EA and 160 AA individuals  
+•	Analysis of over 25 million methylation sites  
+•	Identification of cis- and trans-methylation quantitative trait loci (meQTLs)  
+•	Development of population-specific DNA methylation imputation models  
+•	MWAS analysis of 41 complex traits using Million Veteran Program (MVP) data  
 
-Please cite the following manuscript for using DNAm models built and association results by our work:
+Our study provides:  
+•	CpG-trait associations: Direct links between specific methylation sites and complex traits  
+•	Gene-trait associations: Aggregated effects of methylation on genes associated with various phenotypes  
+This resource bridges the gap between genomics and the monocyte methylome, offering insights into:  
+
+•	Genetic regulation of DNA methylation  
+•	Novel methylation-phenotype associations  
+•	Transferability of findings across diverse ancestries  
+
+This work is partially supported by grants from the NIH (U19AG055373, R01AG061917, R01AR069055, P20GM109036, R01CA263494). The content is solely the responsibility of the authors and does not necessarily represent the official views of the National Institutes of Health.    
+
+Please cite the following manuscript for using DNAm models built and association results by our work:  
 
 > Zhang, W., Zhang, X., Qiu, C., Zhang, Z., Su, K., Luo, Z., Liu, M., Zhao, B., Wu, L., Tian, Q., Shen, H., Wu, C. and Deng, H., 2024. An atlas of genetic effects on the monocyte methylome across European and African populations. Under Review.
-> 
+
+The MWAS results are provided in our website: [gcbhub.org](https://www.gcbhub.org/)  
 ## Workflow
 ![Alt text](https://github.com/ChongWuLab/Multi-ancestry-monocytes-methylome-study/blob/main/Fig1.png)
 

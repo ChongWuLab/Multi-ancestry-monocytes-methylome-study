@@ -9,7 +9,7 @@ Key Features:
 •	MWAS analysis of 41 complex traits using Million Veteran Program (MVP) data  
 
 Our study provides:  
-•	meQTL mappings results: Direct links between DNA methylation and genetic variants.
+•	meQTL mappings results: Direct links between DNA methylation and genetic variants.  
 •	CpG-trait associations: Direct links between specific methylation sites and complex traits  
 •	Gene-trait associations: Aggregated effects of methylation on genes associated with various phenotypes  
 

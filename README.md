@@ -2,21 +2,21 @@
 ## Introduction
 This is a comprehensive multi-ancestry methylome-wide association study (MWAS) conducted on purified monocytes from European American (EA) and African American (AA) populations.
 Key Features:  
-•	Whole-genome bisulfite sequencing (WGBS) data from 298 EA and 160 AA individuals  
-•	Analysis of over 25 million methylation sites  
-•	Identification of cis- and trans-methylation quantitative trait loci (meQTLs)  
-•	Development of population-specific DNA methylation imputation models  
-•	MWAS analysis of 41 complex traits using Million Veteran Program (MVP) data  
+*	Whole-genome bisulfite sequencing (WGBS) data from 298 EA and 160 AA individuals  
+*	Analysis of over 25 million methylation sites  
+*	Identification of cis- and trans-methylation quantitative trait loci (meQTLs)  
+*	Development of population-specific DNA methylation imputation models  
+*	MWAS analysis of 41 complex traits using Million Veteran Program (MVP) data  
 
 Our study provides:  
-•	meQTL mappings results: Direct links between DNA methylation and genetic variants.  
-•	CpG-trait associations: Direct links between specific methylation sites and complex traits  
-•	Gene-trait associations: Aggregated effects of methylation on genes associated with various phenotypes  
+*	meQTL mappings results: Direct links between DNA methylation and genetic variants.  
+*	CpG-trait associations: Direct links between specific methylation sites and complex traits  
+*	Gene-trait associations: Aggregated effects of methylation on genes associated with various phenotypes  
 
 This resource bridges the gap between genomics and the monocyte methylome, offering insights into:  
-•	Genetic regulation of DNA methylation  
-•	Novel methylation-phenotype associations  
-•	Transferability of findings across diverse ancestries  
+*	Genetic regulation of DNA methylation  
+*	Novel methylation-phenotype associations  
+*	Transferability of findings across diverse ancestries  
 
 This work is partially supported by grants from the NIH (U19AG055373, R01AG061917, R01AR069055, P20GM109036, R01CA263494). The content is solely the responsibility of the authors and does not necessarily represent the official views of the National Institutes of Health.    
 

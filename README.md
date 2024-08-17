@@ -24,7 +24,7 @@ Please cite the following manuscript for using DNAm models built and association
 
 > Zhang, W., Zhang, X., Qiu, C., Zhang, Z., Su, K., Luo, Z., Liu, M., Zhao, B., Wu, L., Tian, Q., Shen, H., Wu, C. and Deng, H., 2024. An atlas of genetic effects on the monocyte methylome across European and African populations. Under Review.
 
-The MWAS results are provided in our website: [gcbhub.org](https://www.gcbhub.org/)  
+The MWAS results are provided in our website: [gcbhub.org](https://www.gcbhub.org/)  meQTL results are provided in [https://osf.io/gct57/](https://osf.io/gct57/)
 ## Workflow
 ![Alt text](https://github.com/ChongWuLab/Multi-ancestry-monocytes-methylome-study/blob/main/Fig1.png)
 

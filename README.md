@@ -1,6 +1,6 @@
 # Multi-ancestry-monocytes-methylome-study
 ## Introduction
-This is a comprehensive multi-ancestry methylome-wide association study (MWAS) conducted on purified monocytes from European American (EA) and African American (AA) populations.
+This is a comprehensive multi-ancestry methylome study conducted on purified monocytes from European American (EA) and African American (AA) populations.
 Key Features:  
 *	Whole-genome bisulfite sequencing (WGBS) data from 298 EA and 160 AA individuals  
 *	Analysis of over 25 million methylation sites  

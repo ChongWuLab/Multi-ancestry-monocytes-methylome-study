@@ -3,11 +3,11 @@ library(ggplot2)
 library(data.table)
 library(dplyr)
 #library(rtracklayer)
-h2_df_CAU = readRDS("/rsrch5/home/biostatistics/wzhang24/mQTL_project/Results/02-h2-CAU/all_h2.RDS")
+h2_df_CAU = readRDS("/rsrch5/home/biostatistics/chongwulab/wzhang24/MWAS/Results/h2/all_h2_CAU.RDS")
 h2_df_CAU$h2 = as.numeric(h2_df_CAU$h2)
 h2_df_CAU$bin <- cut(h2_df_CAU$h2, breaks = seq(0, 1, by = 0.1),right=FALSE)
 
-h2_df_AFA = readRDS("/rsrch5/home/biostatistics/wzhang24/mQTL_project/Results/02-h2-AFA/all_h2.RDS")
+h2_df_AFA = readRDS("/rsrch5/home/biostatistics/chongwulab/wzhang24/MWAS/Results/h2/all_h2_AFA.RDS")
 h2_df_AFA$h2 = as.numeric(h2_df_AFA$h2)
 h2_df_AFA$bin <- cut(h2_df_AFA$h2, breaks = seq(0, 1, by = 0.1),right=FALSE)
 
@@ -16,13 +16,13 @@ cpg_count_CAU <- aggregate(CpG ~ bin, data = h2_df_CAU, FUN = function(x) length
 cpg_count_AFA <- aggregate(CpG ~ bin, data = h2_df_AFA, FUN = function(x) length(unique(x)))
 
 # Find out which CpGs have mQTLs by checking if they appear in the mQTL dataframe
-mqtl_df_CAU <- readRDS("/rsrch5/home/biostatistics/wzhang24/mQTL_project/Results/03-mQTL-res/CAU/final_data_CAU.RDS")
-mqtl_df_AFA <- readRDS("/rsrch5/home/biostatistics/wzhang24/mQTL_project/Results/03-mQTL-res/AFA/final_data_AFA.RDS")
+mqtl_df_CAU <- readRDS("/rsrch5/home/biostatistics/chongwulab/wzhang24/MWAS/Results/meQTL/final_cis_fdr_0.01_CAU.RDS")
+mqtl_df_AFA <- readRDS("/rsrch5/home/biostatistics/chongwulab/wzhang24/MWAS/Results/meQTL/final_cis_fdr_0.01_AFA.RDS")
 h2_df_CAU$has_mQTL <- h2_df_CAU$CpG %in% mqtl_df_CAU$CpG
 h2_df_AFA$has_mQTL <- h2_df_AFA$CpG %in% mqtl_df_AFA$CpG
 
-saveRDS(h2_df_CAU,file="/rsrch5/home/biostatistics/wzhang24/mQTL_project/Results/02-h2-CAU/all_h2.RDS")
-saveRDS(h2_df_AFA,file="/rsrch5/home/biostatistics/wzhang24/mQTL_project/Results/02-h2-AFA/all_h2.RDS")
+saveRDS(h2_df_CAU,file="/rsrch5/home/biostatistics/chongwulab/wzhang24/MWAS/Results/h2/all_h2_CAU.RDS")
+saveRDS(h2_df_AFA,file="/rsrch5/home/biostatistics/chongwulab/wzhang24/MWAS/Results/h2/all_h2_AFA.RDS")
 
 #================================================================================================
 # Begin with this part
@@ -30,12 +30,14 @@ saveRDS(h2_df_AFA,file="/rsrch5/home/biostatistics/wzhang24/mQTL_project/Results
 library(ggplot2)
 library(data.table)
 library(dplyr)
+
+save.dir = "/rsrch5/home/biostatistics/chongwulab/wzhang24/MWAS/Results/h2/figures/"
 #h2_df_AFA = h2_df_AFA %>% filter(h2 > 0) #25680499
 #h2_df_CAU = h2_df_CAU %>% filter(h2 > 0) #25678678 
 #saveRDS(h2_df_CAU,file="/rsrch5/home/biostatistics/wzhang24/mQTL_project/Results/02-h2-CAU/all_h2.RDS")
 #saveRDS(h2_df_AFA,file="/rsrch5/home/biostatistics/wzhang24/mQTL_project/Results/02-h2-AFA/all_h2.RDS")
-h2_df_CAU = readRDS("/rsrch5/home/biostatistics/wzhang24/mQTL_project/Results/02-h2-CAU/all_h2.RDS")
-h2_df_AFA = readRDS("/rsrch5/home/biostatistics/wzhang24/mQTL_project/Results/02-h2-AFA/all_h2.RDS")
+h2_df_CAU = readRDS("/rsrch5/home/biostatistics/chongwulab/wzhang24/MWAS/Results/h2/all_h2_CAU.RDS")
+h2_df_AFA = readRDS("/rsrch5/home/biostatistics/chongwulab/wzhang24/MWAS/Results/h2/all_h2_AFA.RDS")
 
 # t-test
 t.test(h2_df_CAU$h2, h2_df_AFA$h2, alternative = "two.sided", mu = 0, paired = FALSE, var.equal = FALSE, conf.level = 0.95) # p < 2.2e-16
@@ -97,7 +99,7 @@ ggplot(combined_df, aes(x = factor(threshold), y = proportion, fill = Population
         panel.border = element_rect(color = "black", fill = NA, linewidth = 0.5)) +
   scale_fill_manual(values = c("EA" = "#E76254", "AA" = "#72BCD5"))
 
-ggsave("/rsrch5/home/biostatistics/wzhang24/mQTL_project/Results/02-h2/2b-h2_pvalue_combined.png", width=8, height=5, units = "in", dpi = 300)
+ggsave(paste0(save.dir, "Fig3b-h2_pvalue_combined.png"), width=8, height=5, units = "in", dpi = 300)
 
 
 
@@ -145,7 +147,7 @@ ggplot(combined_df, aes(x = bin, y = percentage, color = Population, group = Pop
         panel.grid.minor = element_blank(),
         axis.line = element_line(color = "black", linewidth = 0.3),
         panel.border = element_rect(color = "black", fill = NA, linewidth = 0.5))
-ggsave("/rsrch5/home/biostatistics/wzhang24/mQTL_project/Results/02-h2/2c-h2_cpg_combined.png",width=5,height=5, units = "in", dpi = 300)
+ggsave(paste0(save.dir, "Fig3c-h2_cpg_combined.png"),width=5,height=5, units = "in", dpi = 300)
  
 ##### Histogram of h2 together
 # Add a distinguishing column to each dataframe
@@ -178,13 +180,20 @@ ggplot(combined_h2_df, aes(x = h2,fill = Population)) +
         axis.line = element_line(color = "black", linewidth = 0.3),
         panel.border = element_rect(color = "black", fill = NA, linewidth = 0.5)) +
   scale_fill_manual(values = c("EA" = "#E76254", "AA" = "#72BCD5"))
-ggsave("/rsrch5/home/biostatistics/wzhang24/mQTL_project/Results/02-h2/2a-h2_hist_combined.png", width=8, height=5, units = "in", dpi = 300)
+ggsave(paste0(save.dir, "Fig3a-h2_hist_combined.png"), width=8, height=5, units = "in", dpi = 300)
 
 ##### Boxplot of h2 together
 #h2_df_CAU = h2_df_CAU %>% filter(h2 > 0.01)
 #h2_df_AFA = h2_df_AFA %>% filter(h2 > 0.01)
 h2_df_CAU$Category <- ifelse(h2_df_CAU$has_mQTL, "cis-meQTL CpGs", "non cis-meQTL CpGs")
 h2_df_AFA$Category <- ifelse(h2_df_AFA$has_mQTL, "cis-meQTL CpGs", "non cis-meQTL CpGs")
+
+# calculate the mean of h2 for each category
+mean(h2_df_CAU$h2[h2_df_CAU$Category == "cis-meQTL CpGs"]) # 0.18
+mean(h2_df_CAU$h2[h2_df_CAU$Category == "non cis-meQTL CpGs"]) # 0.02
+mean(h2_df_AFA$h2[h2_df_AFA$Category == "cis-meQTL CpGs"])
+mean(h2_df_AFA$h2[h2_df_AFA$Category == "non cis-meQTL CpGs"])
+
 # Sample 1000 rows from each dataframe
 h2_df_CAU_sample <- h2_df_CAU %>% sample_n(50000)
 h2_df_AFA_sample <- h2_df_AFA %>% sample_n(50000)
@@ -227,7 +236,7 @@ p <- ggplot(combined_df, aes(x = Category, y = h2, fill = Population)) +
     panel.border = element_rect(color = "black", fill = NA, linewidth = 0.5)
   )
 
-ggsave("/rsrch5/home/biostatistics/wzhang24/mQTL_project/Results/02-h2/2d-h2_boxplot_combined2.jpg", width=5, height=5, units = "in", dpi = 300)
+ggsave(paste0(save.dir, "Fig3d-h2_boxplot_combined2.jpg"), width=5, height=5, units = "in", dpi = 300)
 
 
 
@@ -325,6 +334,8 @@ ggsave("/rsrch5/home/biostatistics/wzhang24/mQTL_project/Results/02-h2/2e-h2_box
 # nonzero h2
 median(h2_df_AFA$h2)
 median(h2_df_CAU$h2)
+mean(h2_df_AFA$h2)
+mean(h2_df_CAU$h2)
 #overlap
 overlap = intersect(h2_df_AFA$CpG, h2_df_CAU$CpG)
 length(overlap)

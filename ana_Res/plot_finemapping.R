@@ -1,17 +1,19 @@
 library(ggplot2)
-
-res_fm_CAU = readRDS("/rsrch5/home/biostatistics/wzhang24/mQTL_project/Results/08-finemapping/CAU/unique_variants_count.RDS")
+res.dir = "/rsrch5/home/biostatistics/chongwulab/wzhang24/MWAS/Results/finemapping/"
+res_fm_CAU = readRDS(paste0(res.dir, "unique_variants_count_CAU.RDS"))
 res_fm_CAU = unlist(res_fm_CAU)
 # remove those names = ""
 res_fm_CAU = res_fm_CAU[names(res_fm_CAU) != ""]
 median(res_fm_CAU)
+mean(res_fm_CAU)
 IQR(res_fm_CAU)
 
-res_fm_AFA = readRDS("/rsrch5/home/biostatistics/wzhang24/mQTL_project/Results/08-finemapping/AFA/unique_variants_count.RDS")
+res_fm_AFA = readRDS(paste0(res.dir, "unique_variants_count_AFA.RDS"))
 res_fm_AFA = unlist(res_fm_AFA)
 # remove those names = ""
 res_fm_AFA = res_fm_AFA[names(res_fm_AFA) != ""]
 median(res_fm_AFA)
+mean(res_fm_AFA)
 IQR(res_fm_AFA)
 
 

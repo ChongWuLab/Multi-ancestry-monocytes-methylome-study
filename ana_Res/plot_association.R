@@ -6,9 +6,51 @@ library(dplyr)
 library(data.table)
 library(ggplot2)
 #library(grid)
-res.A = readRDS("/rsrch5/scratch/biostatistics/wzhang24/GWAS/res/AFA/05-association/AFA_associations_ACAT.RDS")
-res.C = readRDS("/rsrch5/scratch/biostatistics/wzhang24/GWAS/res/CAU/05-association/CAU_associations_ACAT.RDS")
-save.dir = "/rsrch5/home/biostatistics/wzhang24/mQTL_project/Results/06-association/"
+res.A = readRDS("/rsrch5/home/biostatistics/chongwulab/wzhang24/MWAS/Results/associations/AFA_associations_ACAT_all.RDS")
+res.C = readRDS("/rsrch5/home/biostatistics/chongwulab/wzhang24/MWAS/Results/associations/CAU_associations_ACAT_all.RDS")
+res.A = res.A[res.A$p_bf < 0.05,] # threshold = 0.05/51680427
+res.C = res.C[res.C$p_bf < 0.05,]
+
+res.A = res.A[!duplicated(res.A),] # 686
+res.C = res.C[!duplicated(res.C),] # 5311
+save.dir = "/rsrch5/home/biostatistics/chongwulab/wzhang24/MWAS/Results/associations/"
+
+# Get traits information
+Fingene_id <- fread("/rsrch5/home/biostatistics/wzhang24/mQTL_project/Results/06-association/dbGAP_Upload_Tracking_JUNE2023.csv", skip = 1, data.table = FALSE)
+dim(Fingene_id)
+Fingene_id <- Fingene_id[,c("Trait", "Ethnicity", "Association Filename","Broad Category")]
+Fingene_id$`Association Filename` <- gsub(".txt.gz","",Fingene_id$`Association Filename`)
+Fingene_id$`Association Filename` <- gsub(".gz","",Fingene_id$`Association Filename`)
+
+# Merge trait info with res tables
+res.A <- merge(res.A, Fingene_id, by.x = "trait", by.y = "Association Filename") # 686
+res.C <- merge(res.C, Fingene_id, by.x = "trait", by.y = "Association Filename") # 5284
+length(unique(res.A$Trait)) #14
+length(unique(res.C$Trait)) #28
+length(unique(res.A$`Broad Category`)) #6
+length(unique(res.C$`Broad Category`)) #7
+
+# map gene to ensembl gene id
+library(biomaRt)
+ensembl <- useMart("ENSEMBL_MART_ENSEMBL", dataset = "hsapiens_gene_ensembl")
+# AA
+ensembl_id <- unique(res.A$ensembl_gene_id)
+gene_info <- getBM(attributes = c("ensembl_gene_id", "hgnc_symbol"), filters = "ensembl_gene_id", values = ensembl_id, mart = ensembl)
+geno_info <- gene_info[!duplicated(gene_info$ensembl_gene_id),]
+res.A <- left_join(res.A, gene_info, by = "ensembl_gene_id")
+write.csv(res.A, paste0(save.dir,"AFA-gene-MVP-bf.csv"), row.names = FALSE)
+
+# EA
+ensembl_id <- unique(res.C$ensembl_gene_id)
+gene_info <- getBM(attributes = c("ensembl_gene_id", "hgnc_symbol"), filters = "ensembl_gene_id", values = ensembl_id, mart = ensembl)
+gene_info <- gene_info[!duplicated(gene_info$ensembl_gene_id),]
+res.C <- left_join(res.C, gene_info, by = "ensembl_gene_id")
+write.csv(res.C, paste0(save.dir,"CAU-gene-MVP-bf.csv"), row.names = FALSE)
+
+############This part is for all the results##################################
+res.dir = "/rsrch5/home/biostatistics/chongwulab/wzhang24/MWAS/Results/associations/"
+res.A = readRDS(paste0(res.dir,"AFA_associations_ACAT_all.RDS"))
+res.C = readRDS(paste0(res.dir,"CAU_associations_ACAT_all.RDS"))
 
 # Get traits information
 Fingene_id <- fread("/rsrch5/home/biostatistics/wzhang24/mQTL_project/Results/06-association/dbGAP_Upload_Tracking_JUNE2023.csv", skip = 1, data.table = FALSE)
@@ -20,8 +62,10 @@ Fingene_id$`Association Filename` <- gsub(".gz","",Fingene_id$`Association Filen
 # Merge trait info with res tables
 res.A <- merge(res.A, Fingene_id, by.x = "trait", by.y = "Association Filename") # 1109
 res.C <- merge(res.C, Fingene_id, by.x = "trait", by.y = "Association Filename") # 8670
+res.C <- res.C %>% distinct(trait, ensembl_gene_id, .keep_all = TRUE)
+res.A <- res.A %>% distinct(trait, ensembl_gene_id, .keep_all = TRUE)
 length(unique(res.A$Trait)) #17
-length(unique(res.C$Trait)) #30
+length(unique(res.C$Trait)) #32
 length(unique(res.A$`Broad Category`)) #7
 length(unique(res.C$`Broad Category`)) #7
 
@@ -33,39 +77,45 @@ ensembl_id <- unique(res.A$ensembl_gene_id)
 gene_info <- getBM(attributes = c("ensembl_gene_id", "hgnc_symbol"), filters = "ensembl_gene_id", values = ensembl_id, mart = ensembl)
 geno_info <- gene_info[!duplicated(gene_info$ensembl_gene_id),]
 res.A <- left_join(res.A, gene_info, by = "ensembl_gene_id")
-write.csv(res.A, "/rsrch5/home/biostatistics/wzhang24/mQTL_project/Results/06-association/AFA-gene-MVP-bf.csv", row.names = FALSE)
+colnames(res.A)[colnames(res.A) == "hgnc_symbol"] <- "Gene"
+colnames(res.A)[colnames(res.A) == "trait"] <- "Trait_file_fullname"
+write.table(res.A, "/rsrch5/home/biostatistics/wzhang24/mQTL_project/Results/06-association/AA_gene_trait_all.txt", quote = T, sep = "\t", row.names = FALSE)
 
 # EA
 ensembl_id <- unique(res.C$ensembl_gene_id)
 gene_info <- getBM(attributes = c("ensembl_gene_id", "hgnc_symbol"), filters = "ensembl_gene_id", values = ensembl_id, mart = ensembl)
 gene_info <- gene_info[!duplicated(gene_info$ensembl_gene_id),]
 res.C <- left_join(res.C, gene_info, by = "ensembl_gene_id")
-write.csv(res.C, "/rsrch5/home/biostatistics/wzhang24/mQTL_project/Results/06-association/CAU-gene-MVP-bf.csv", row.names = FALSE)
+colnames(res.C)[colnames(res.C) == "hgnc_symbol"] <- "Gene"
+colnames(res.C)[colnames(res.C) == "trait"] <- "Trait_file_fullname"
+# save to txt
+write.table(res.C, "/rsrch5/home/biostatistics/chongwulab/wzhang24/MWAS/Results/associations/EA_gene_trait_all.txt", quote = T, sep = "\t", row.names = FALSE)
+##############################################################################
+
+
 
 # combined res
-combined_res <- merge(res.A,res.C,by = c("Trait","ensembl_gene_id", "Broad Category"), suffixes = c(".A",".C")) # 747 associations
-length(unique(combined_res$Trait)) #14
+combined_res <- merge(res.A,res.C,by = c("Trait","ensembl_gene_id", "Broad Category"), suffixes = c(".A",".C")) # 478 associations
+length(unique(combined_res$Trait)) #12
 length(unique(combined_res$`Broad Category`)) #6
-write.csv(combined_res, "/rsrch5/home/biostatistics/wzhang24/mQTL_project/Results/06-association/combined-gene-MVP-bf.csv", row.names = FALSE)
+write.csv(combined_res, paste0(save.dir,"combined-gene-MVP-bf.csv"), row.names = FALSE)
 
 # associations in AA but not in EA
 res.A.only <- anti_join(res.A, combined_res, by = c("Trait", "ensembl_gene_id", "Broad Category"))
 res.C.only <- anti_join(res.C, combined_res, by = c("Trait", "ensembl_gene_id", "Broad Category"))
-write.csv(res.A.only, "/rsrch5/home/biostatistics/wzhang24/mQTL_project/Results/06-association/AFA-only-gene-MVP-bf.csv", row.names = FALSE)
-write.csv(res.C.only, "/rsrch5/home/biostatistics/wzhang24/mQTL_project/Results/06-association/CAU-only-gene-MVP-bf.csv", row.names = FALSE)
+write.csv(res.A.only, paste0(save.dir,"AFA-only-gene-MVP-bf.csv"), row.names = FALSE)
+write.csv(res.C.only, paste0(save.dir,"CAU-only-gene-MVP-bf.csv"), row.names = FALSE)
 
 # Start from reading the results if we have them
-combined_res <- read.csv("/rsrch5/home/biostatistics/wzhang24/mQTL_project/Results/06-association/combined-gene-MVP-bf.csv")
-res.A <- read.csv("/rsrch5/home/biostatistics/wzhang24/mQTL_project/Results/06-association/AFA-gene-MVP-bf.csv")
-res.C <- read.csv("/rsrch5/home/biostatistics/wzhang24/mQTL_project/Results/06-association/CAU-gene-MVP-bf.csv")
+combined_res <- read.csv(paste0(save.dir,"combined-gene-MVP-bf.csv"))
+res.A <- read.csv(paste0(save.dir,"AFA-gene-MVP-bf.csv"))
+res.C <- read.csv(paste0(save.dir,"CAU-gene-MVP-bf.csv"))
 # analysis T2D
 T2D_res <- combined_res[combined_res$Trait == "T2D",]
-length(unique(T2D_res$ensembl_gene_id))
+length(unique(T2D_res$ensembl_gene_id)) # 6
+#[1] "ENSG00000029534" "ENSG00000140718" "ENSG00000148737" "ENSG00000151532"
+#[5] "ENSG00000165066" "ENSG00000180176"
 
-# "ENSG00000148737" "ENSG00000029534" "ENSG00000151532" "ENSG00000140718"
-# "ENSG00000165066" "ENSG00000180176" "ENSG00000140382" "ENSG00000106633"
-# "ENSG00000149948" "ENSG00000160360" "ENSG00000173517" "ENSG00000124721"
-# "ENSG00000153814"
 # sort T2D_res by p_bf
 T2D_res <- T2D_res[order(T2D_res$p_bf.A),]
 unique(T2D_res$ensembl_gene_id)
@@ -79,45 +129,14 @@ unique(T2D_res$ensembl_gene_id)
 T2D_res_A <- res.A[res.A$Trait == "T2D",]
 T2D_res_C <- res.C[res.C$Trait == "T2D",]
 # find genes that are specific in AA but not in EA
-T2D_gene_AA_only = unique(T2D_res_A$ensembl_gene_id[!(T2D_res_A$ensembl_gene_id %in% T2D_res_C$ensembl_gene_id)])
-# "ENSG00000106631" "ENSG00000182379" "ENSG00000166006" "ENSG00000255730"
-# "ENSG00000248098" "ENSG00000077348" "ENSG00000164512"
-T2D_res_A[T2D_res_A$ensembl_gene_id %in% T2D_gene_AA_only,]
+T2D_gene_AA_only = unique(T2D_res_A$ensembl_gene_id[!(T2D_res_A$ensembl_gene_id %in% T2D_res_C$ensembl_gene_id)]) # 1
+# "ENSG00000077348"
 
-# Analysis of AUD
-AUD_res <- combined_res[combined_res$Trait == "AUD",]
-# ENSG00000138813 C4orf17
-# ENSG00000138823 MTTP
-# no result
+T2D_gene_EA_only = unique(T2D_res_C$ensembl_gene_id[!(T2D_res_C$ensembl_gene_id %in% T2D_res_A$ensembl_gene_id)]) # 703
 
-# analysis of CIHS
-CIHS_res <- combined_res[combined_res$Trait == "CIHS",]
-# ENSG00000130203 APOE
-# ENSG00000130204 TOMM40
 
-# height
-height_res <- combined_res[combined_res$Trait == "Height",]
-height_res <- height_res[order(height_res$p_bf.A),]
-unique(height_res$ensembl_gene_id)
-length(unique(height_res$ensembl_gene_id))
-# "ENSG00000157766" "ENSG00000112033" "ENSG00000065029" "ENSG00000023892"
-# ACAN, PPARD, ZNF76, DEF6
 
-# BMI
-BMI_res <- combined_res[combined_res$Trait == "BMI",]
-BMI_res <- BMI_res[order(BMI_res$p_bf.A),]
-unique(BMI_res$ensembl_gene_id)
-length(unique(BMI_res$ensembl_gene_id))
-# "ENSG00000140718" "ENSG00000188322" "ENSG00000196296" "ENSG00000198156"
-# "ENSG00000168488" "ENSG00000178188" "ENSG00000196993" "ENSG00000196502"
-# "ENSG00000177548" "ENSG00000197165"
 
-# FTO, SBK1, ATP2A1, NPIPB6
-# ATXN2L, SH2B1, 
-
-# HDL
-HDL_res <- combined_res[combined_res$Trait == "HDL",] # 66
-HDL_res <- HDL_res[order(HDL_res$p_bf.EUR),]
 
 ##### Analysis the results for 450k and 900k
 # 450k
@@ -170,14 +189,16 @@ T2D_res_900k <- combined_res_900k[combined_res_900k$Trait == "T2D",] #3
 ##########################################################################
 ##### CpG-level analysis##################################################
 ##########################################################################
+
+############ First time began here#######################################
 library(dplyr)
 library(data.table)
 library(ggplot2)
-res.A = readRDS("/rsrch5/scratch/biostatistics/wzhang24/GWAS/res/AFA/05-association/AFA-association-MVP-bf.RDS")
-res.C = readRDS("/rsrch5/scratch/biostatistics/wzhang24/GWAS/res/CAU/05-association/CAU-association-MVP-bf.RDS")
+res.A = readRDS("/rsrch5/home/biostatistics/chongwulab/wzhang24/MWAS/Results/associations/AFA-association-MVP-bf.RDS")
+res.C = readRDS("/rsrch5/home/biostatistics/chongwulab/wzhang24/MWAS/Results/associations/CAU-association-MVP-bf.RDS")
 res.A <- res.A$res.table
 res.C <- res.C$res.table
-save.dir = "/rsrch5/home/biostatistics/wzhang24/mQTL_project/Results/06-association/"
+#save.dir = "/rsrch5/home/biostatistics/wzhang24/mQTL_project/Results/06-association/"
 # remove duplicate
 res.A <- res.A[!duplicated(res.A),]
 res.C <- res.C[!duplicated(res.C),]
@@ -186,7 +207,7 @@ res.C <- res.C[!duplicated(res.C),]
 res.A <- res.A[res.A$n_used_snp > 10, ] # 2998
 res.C <- res.C[res.C$n_used_snp > 10, ] # 31336
 
-write.csv(res.A, "/rsrch5/home/biostatistics/wzhang24/mQTL_project/Results/06-association/AFA-association-MVP-bf.csv")
+#write.csv(res.A, "/rsrch5/home/biostatistics/wzhang24/mQTL_project/Results/06-association/AFA-association-MVP-bf.csv")
 
 # Get traits information
 Fingene_id <- fread("/rsrch5/home/biostatistics/wzhang24/mQTL_project/Results/06-association/dbGAP_Upload_Tracking_JUNE2023.csv", skip = 1, data.table = FALSE)
@@ -199,6 +220,22 @@ Fingene_id$`Association Filename` <- gsub(".gz","",Fingene_id$`Association Filen
 res.A <- merge(res.A, Fingene_id, by.x = "trait", by.y = "Association Filename") # 2998
 res.C <- merge(res.C, Fingene_id, by.x = "trait", by.y = "Association Filename") # 31264
 
+#res.A <- res.A[, c("trait", "chr", "p0","p1","gene","p_alt","beta_alt", "se_alt", "Trait", "Broad Category")]
+#colnames(res.A) = c("Trait_file_fullname", "chr", "Postion_start","Position_end","CpG","P","beta","se","Trait", "Broad Category")
+#res.C <- res.C[, c("trait", "chr", "p0","p1","gene","p_alt","beta_alt", "se_alt", "Trait", "Broad Category")]
+#colnames(res.C) = c("Trait_file_fullname", "chr", "Postion_start","Position_end","CpG","P","beta","se","Trait", "Broad Category")
+
+# save to txt file
+#write.table(res.A, "/rsrch5/home/biostatistics/chongwulab/wzhang24/MWAS/Results/associations/AA_cpg_trait.txt", quote = T, sep = "\t", row.names = FALSE)
+#write.table(res.C, "/rsrch5/home/biostatistics/chongwulab/wzhang24/MWAS/Results/associations/EA_cpg_trait.txt", quote = T, sep = "\t", row.names = FALSE)
+
+saveRDS(res.A, "/rsrch5/home/biostatistics/chongwulab/wzhang24/MWAS/Results/associations/AFA-association-MVP-bf.RDS")
+saveRDS(res.C, "/rsrch5/home/biostatistics/chongwulab/wzhang24/MWAS/Results/associations/CAU-association-MVP-bf.RDS")
+
+################### Second time began here######################################
+res.A = readRDS("/rsrch5/home/biostatistics/chongwulab/wzhang24/MWAS/Results/associations/AFA-association-MVP-bf.RDS")
+res.C = readRDS("/rsrch5/home/biostatistics/chongwulab/wzhang24/MWAS/Results/associations/CAU-association-MVP-bf.RDS")
+save.dir = "/rsrch5/home/biostatistics/chongwulab/wzhang24/MWAS/Results/associations/figures/"
 # Merge res.A and res.C using Trait and gene
 combined_res <- merge(res.A,res.C,by = c("Trait","gene", "Broad Category"), suffixes = c(".A",".C")) # 468 associations
 combined_res$Zscore.AFR <- combined_res$beta_alt.A/combined_res$se_alt.A
@@ -211,9 +248,9 @@ combined_res$Inconsistency <- ifelse((combined_res$Zscore.AFR > 0 & combined_res
 combined_res$Inconsistency <- factor(combined_res$Inconsistency, levels = c("Addiction", "Anthropometry", 
                                                                             "CVD", "Lipids", "Metabolic", "Renal",
                                                                              "Inconsistent pairs"))
-length(unique(combined_res$gene)) # 433
-sum(combined_res$Inconsistency=="Inconsistent pairs") # 22 
-unique(combined_res$Trait) # 12
+length(unique(combined_res$gene)) # 434
+sum(combined_res$Inconsistency=="Inconsistent pairs") # 29
+unique(combined_res$Trait) # 11
 dim(combined_res) # 621
 ##### Consistency plot
 # Color mapping for Broad Categories
@@ -248,7 +285,7 @@ ggplot(combined_res, aes(x = Zscore.AFR, y = Zscore.EUR, color = Inconsistency))
   geom_vline(xintercept = 0, linetype = "dashed", color = "black") + # Vertical line at x = 0
   geom_hline(yintercept = 0, linetype = "dashed", color = "black") + # Horizontal line at y = 0
   geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "black")
-ggsave(paste0(save.dir,"3b-scatter.jpg"))
+ggsave(paste0(save.dir,"Fig4b-scatter.jpg"))
 
 
 ##### manhattan plot
@@ -323,7 +360,7 @@ p <- ggplot(res.combined, aes(x = xpos, y = -log10(p_alt), color = Broad_Categor
   # y limit from 10 to 120
   
 
-ggsave(paste0(save.dir, "3a-manhattan.jpg"), p, width = 11, height = 7, units = "in", dpi = 300)
+ggsave(paste0(save.dir, "Fig4a-manhattan.jpg"), p, width = 11, height = 7, units = "in", dpi = 300)
 
 
 ##### CpG annotation
@@ -335,7 +372,7 @@ consistent_res <- consistent_res[,c("Trait", "gene", "Broad Category","p_alt.A",
 
 # merge
 merged_res <- merge(consistent_res, annotation, by.x = "gene", by.y = "CpG")
-sum(merged_res$annotation == "open_sea") # 529
-sum(merged_res$annotation == "shore") # 30
-sum(merged_res$annotation == "shelf") # 24
-sum(merged_res$annotation == "island") # 16
+sum(merged_res$annotation == "open_sea") # 532
+sum(merged_res$annotation == "shore") # 31
+sum(merged_res$annotation == "shelf") # 19
+sum(merged_res$annotation == "island") # 12
